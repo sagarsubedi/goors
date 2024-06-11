@@ -1,4 +1,4 @@
-package utils
+package main
 
 type Constants struct {
 	DefaultAPIVersion   string

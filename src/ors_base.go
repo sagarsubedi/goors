@@ -1,10 +1,12 @@
-package utils
+package main
 
 import (
 	"bytes"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -12,6 +14,7 @@ import (
 type OrsBase struct {
 	DefaultArgs   map[string]interface{}
 	RequestArgs   map[string]interface{}
+	HttpArgs      map[string]interface{}
 	ArgsCache     map[string]interface{}
 	CustomHeaders map[string]string
 }
@@ -24,7 +27,7 @@ func NewOrsBase(args map[string]interface{}) *OrsBase {
 		CustomHeaders: make(map[string]string),
 	}
 
-	// TODO: call setRequestDefaults
+	obj.setRequestDefaults(args)
 	return obj
 }
 
@@ -89,4 +92,48 @@ func (ob *OrsBase) fetchRequest(body interface{}, client *http.Client) (*http.Re
 	}
 
 	return client.Do(req)
+}
+
+func (ob *OrsBase) createRequest(body interface{}) (interface{}, error) {
+	client := &http.Client{Timeout: 5 * time.Second}
+
+	response, err := ob.fetchRequest(body, client)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, errors.New(response.Status)
+	}
+
+	var result interface{}
+	if ob.ArgsCache["format"] == "gpx" {
+		result, err = io.ReadAll(response.Body)
+	} else {
+		err = jsoniter.NewDecoder(response.Body).Decode(&result)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+
+}
+
+// * getBody() is overwritten in directions and isochrones
+func (ob *OrsBase) getBody(map[string]interface{}) map[string]interface{} {
+	return ob.HttpArgs
+}
+
+func (ob *OrsBase) calculate(reqArgs map[string]interface{}) (interface{}, error) {
+	util := OrsUtil{}
+	ob.RequestArgs = reqArgs
+	ob.checkHeaders()
+	ob.RequestArgs = util.FillArgs(ob.DefaultArgs, ob.RequestArgs)
+	ob.ArgsCache = util.SaveArgsToCache(ob.RequestArgs)
+	ob.HttpArgs = util.PrepareRequest(ob.RequestArgs)
+	postBody := ob.getBody(ob.HttpArgs)
+
+	return ob.createRequest(postBody)
 }

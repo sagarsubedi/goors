@@ -1,4 +1,4 @@
-package goors
+package main
 
 import "log"
 
