@@ -63,7 +63,7 @@ func main() {
 ​
 ## Development Setup
 ### Clone the openrouteservice-go repository from GitHub into a development environment of your choice.
-`git clone <https://github.com/sagarsubedi/openrouteservice-go.git>`
+`git clone https://github.com/sagarsubedi/openrouteservice-go.git`
 `cd openrouteservice-go`
 
 ​
