@@ -75,10 +75,6 @@ func main() {
 To run tests, use the Go testing tool:
 `go test ./...`
 
-​
-## Commits and versioning
-This app uses the commitizen plugin to generate standardized commit types/messages. After applying any change in a feature branch, use git add . and then npm run commit (instead of git commit ...). The plugin standard-version is used to generate changelog entries, version tag, and to bump the app version in go.mod.
-
 ## Deployment flow:
 Apply the changes in a feature branch and test it locally.
 Once the feature is ready, merge it to develop, deploy it to the testing environment.
