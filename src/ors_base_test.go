@@ -4,12 +4,20 @@ import (
 	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
+}
+
 func TestConstruction_PassesAPIKey(t *testing.T) {
-	t.Setenv("API_KEY", "YOUR_API")
+	t.Setenv("API_KEY", os.Getenv("API_KEY"))
 	key := os.Getenv("API_KEY")
 	base := NewOrsBase(map[string]interface{}{
 		constants.PropNames.ApiKey: key,
