@@ -1,4 +1,3 @@
-### WIP: Please not that the project is still a work in progress and won't work.
 
 # The Go API to consume openrouteservice(s) painlessly!
 This library lets you consume the openrouteservice API in Go applications. It allows you to painlessly consume the following services:
